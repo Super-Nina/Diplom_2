@@ -7,8 +7,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 
-public class UserModel {
+public class UserModelForAuth {
     private String email;
     private String password;
-    private String name;
 }
