@@ -11,7 +11,7 @@ import static io.restassured.RestAssured.given;
 public class UserSteps {
     @Step("Создание пользователя")
     public static Response createUser(UserModel user) {
-//        Response response = given()
+
               return given()
                 .log().all()
                 .header("Content-type", "application/json")
@@ -19,7 +19,7 @@ public class UserSteps {
                 .body(user)
                 .when()
                 .post(USER_CREATE_ENDPOINT);
-//        return response;
+
     }
 
     @Step("Создание пользователя и получение токена")

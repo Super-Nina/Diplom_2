@@ -3,9 +3,8 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import model.UserModel;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.apache.http.HttpStatus;
+import org.junit.*;
 import steps.UserSteps;
 
 import static data.OrderData.BASE_URI;
@@ -13,19 +12,19 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class OrderTests extends BaseApiTest{
-    private static UserModel userForAuth;
-    protected static UserSteps userSteps;
-    private static String token;
+    private UserModel userForAuth;
+    protected UserSteps userSteps;
+    private String token;
 
-    @BeforeClass
-    public static void startUp() {
+    @Before
+    public void startUp() {
         RestAssured.baseURI = BASE_URI;
         userForAuth = new UserModel("email" + System.currentTimeMillis() + "@test.com", "password", "name");
         userSteps = new UserSteps();
         token = userSteps.createUserAndGetToken(userForAuth);
     }
-    @AfterClass
-    public  static void cleanUp() {
+    @After
+    public  void cleanUp() {
         userSteps.deleteUser(token);
     }
     @Test
@@ -35,7 +34,7 @@ public class OrderTests extends BaseApiTest{
         Response response = orderSteps.createOrderWithAuthAndIngredients(token);
         response.then()
                 .log().all()
-                .statusCode(200)
+                .statusCode(HttpStatus.SC_OK)
                 .body("success", equalTo(true))
                 .body("name", notNullValue())
                 .body("order.owner.email", equalTo(userForAuth.getEmail()));
@@ -48,7 +47,7 @@ public class OrderTests extends BaseApiTest{
         Response response = orderSteps.createOrderWithAuthButWithoutIngredients(token);
         response.then()
                 .log().all()
-                .statusCode(400)
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Ingredient ids must be provided"));
     }
@@ -60,7 +59,7 @@ public class OrderTests extends BaseApiTest{
         Response response = orderSteps.createOrderWithAuthAndWithWrongHash(token);
         response.then()
                 .log().all()
-                .statusCode(500);
+                .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -70,7 +69,7 @@ public class OrderTests extends BaseApiTest{
         Response response = orderSteps.createOrderWithoutAuth();
         response.then()
                 .log().all()
-                .statusCode(200)
+                .statusCode(HttpStatus.SC_OK)
                 .body("success", equalTo(true))
                 .body("name", notNullValue())
                 .body("order.number", notNullValue());

@@ -3,6 +3,7 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import model.UserModel;
 import model.UserModelForAuth;
+import org.apache.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class LoginUserTests {
         userSteps.userAuthorization(userForAuth)
                 .then()
                 .log().all()
-                .statusCode(200)
+                .statusCode(HttpStatus.SC_OK)
                 .body("success", equalTo(true))
                 .body("user.email", equalTo(userForAuth.getEmail()))
                 .body("accessToken", notNullValue())
@@ -57,7 +58,7 @@ public class LoginUserTests {
         userSteps.userAuthorization(userWithWrongLogin)
                 .then()
                 .log().all()
-                .statusCode(401)
+                .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .body("success", equalTo(false))
                 .body("message", equalTo("email or password are incorrect"));
     }
@@ -74,7 +75,7 @@ public class LoginUserTests {
         userSteps.userAuthorization(userWithWrongLogin)
                 .then()
                 .log().all()
-                .statusCode(401)
+                .statusCode(HttpStatus.SC_UNAUTHORIZED)
                 .body("success", equalTo(false))
                 .body("message", equalTo("email or password are incorrect"));
     }
